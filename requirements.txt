@@ -1,0 +1,13 @@
+# Core dependencies for the Jobava London Rationale Explorer.
+# Install with:  pip install -r requirements.txt
+
+streamlit>=1.30        # interactive UI
+chess>=1.10            # python-chess: PGN parsing, board logic, SVG, UCI engine
+
+# Optional: only needed for AI-generated explanations.
+# The app runs fine without it (heuristic explanations are always available).
+anthropic>=0.40
+
+# Note: Stockfish is a separate native binary, NOT a pip package.
+# Install it from https://stockfishchess.org/download/ (or your package manager)
+# and point the app at it via the sidebar or the STOCKFISH_PATH env var.
