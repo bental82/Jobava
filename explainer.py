@@ -638,8 +638,18 @@ def _classify(node: RepNode, board_before: chess.Board) -> str:
         return "Nxd6"
     if san.startswith("Bxc7"):
         return "Bxc7"
+    if san == "Bxe5":
+        return "Bxe5"
+    if san == "dxe5" and node.mover == "White" and node.ply <= 3:
+        return "take_englund"
     if san == "dxe5" or (ptype == chess.PAWN and to_name == "e5" and "x" in san and node.mover == "White"):
         return "dxe5"
+    if san == "exd6" and node.mover == "White":
+        return "exd6"
+    if san == "d5" and node.mover == "White" and ptype == chess.PAWN:
+        return "d5_push"
+    if san == "e5" and node.mover == "White" and ptype == chess.PAWN:
+        return "e5_push"
     if san.startswith("Qxd5"):
         return "Qxd5"
     if san.startswith("Nxc7"):
@@ -667,6 +677,14 @@ def _classify(node: RepNode, board_before: chess.Board) -> str:
 
     # Black's typical tries
     if node.mover == "Black":
+        if san == "e5" and node.ply == 2:
+            return "blk_englund"
+        if san == "cxd6":
+            return "blk_cxd6"
+        if san == "Nh5":
+            return "blk_Nh5"
+        if san == "Rb8":
+            return "blk_Rb8"
         if san in ("Bf5", "Bg4"):
             return "blk_bishop_out"
         if san in ("Bb4",):
@@ -709,6 +727,15 @@ THEME_WHY: Dict[str, str] = {
     "Bd3": "The bishop aims at the h7-square and supports a future e4 break — a classic attacking diagonal.",
     "e4": "The key Jobava break. Backed by Nc3 and Bf4, White strikes in the centre to open lines while ahead in development.",
     "c4": "A space-gaining central move that can transpose toward a more classical queen's-pawn structure.",
+    "Bxe5": "A clean capture in the centre: the bishop removes the recapturing knight, keeping White's extra pawn or superior activity from the earlier exchange.",
+    "take_englund": "Simply accept the gambit. 1...e5 (the Englund Gambit) gives up a pawn for vague activity — White takes it and develops calmly, asking Black to prove compensation that isn't there.",
+    "exd6": "Keeping the extra pawn and the initiative: the capture on d6 disrupts Black's development and leaves White simply a pawn up if Black regains it slowly.",
+    "d5_push": "Against ...c5 White pushes past: d5 grabs space, fixes the centre and leaves Black's c5-pawn biting on granite while White develops comfortably.",
+    "e5_push": "The pawn advances to e5 with tempo, kicking the f6-knight away from the defence of the king and gaining a big space advantage.",
+    "blk_englund": "The Englund Gambit: Black sacrifices a pawn immediately for open lines and tricks (like ...Qb4+). Objectively unsound, but you must know the safe path.",
+    "blk_cxd6": "Black is forced to recapture, accepting doubled d-pawns and an open c-file that can later become a target.",
+    "blk_Nh5": "Black lunges at the f4-bishop to win the bishop pair — at the cost of three tempi with one knight and a misplaced piece on the rim.",
+    "blk_Rb8": "Black side-steps the Nxc7+ fork by moving the rook off a8 — but this loses time and c7 is still fatally weak.",
     "blk_bishop_out": "Black develops the light-squared bishop actively before playing ...e6, a common and sensible idea.",
     "blk_Bb4": "Black pins the c3-knight to add pressure and slow White's e4 break.",
     "blk_Bd6": "Black challenges the f4-bishop and fights for the key dark squares.",
@@ -742,6 +769,15 @@ THEME_JOBAVA: Dict[str, str] = {
     "Bd3": "Bd3 lines up the bishop on the b1-h7 diagonal toward h7 and supports e4 — a standard attacking deployment.",
     "e4": "The e4 break is what separates the Jobava from the dull London: with Nc3 and Bf4 already developed, White opens the centre to attack.",
     "c4": "A more classical, space-based handling that can transpose to mainstream queen's-pawn structures.",
+    "Bxe5": "The tactical dust settles with White on top — a typical outcome of the Nb5/c7 pressure: Black's ...e5 counter-strike fails to concrete moves.",
+    "take_englund": "Not strictly a Jobava position, but part of the repertoire's philosophy: meet sidelines with simple, healthy moves and keep the material.",
+    "exd6": "Same repertoire philosophy as the main lines: when Black plays loosely, take the material and develop — no need for heroics.",
+    "d5_push": "With the centre fixed by d5, White gets a comfortable space edge and can still develop the Bf4/Nc3 way or switch to a mainline setup.",
+    "e5_push": "The e4–e5 space grab is the punishment for slow fianchetto setups: Black's knight is kicked before it settles, and White attacks on the kingside next.",
+    "blk_englund": "The repertoire's answer is pure pragmatism: take on e5, develop with Nf3/Nc3, give nothing back.",
+    "blk_cxd6": "This structure is a long-term win for White: the bishop pair plus Black's doubled d-pawns give you something to play against all game.",
+    "blk_Nh5": "Don't fear ...Nh5 — if the knight takes on f4, exf4 opens the e-file for White and the f4-pawn clamps e5. Black has spent tempi for very little.",
+    "blk_Rb8": "When Nb5 forces awkward moves like ...Rb8, the system has already succeeded — now White cashes in on c7 with Bxc7.",
     "blk_bishop_out": "Black's ...Bf5/...Bg4 invites exactly White's f3 + g4 plan — note how the repertoire chases the bishop and grabs kingside space.",
     "blk_Bb4": "...Bb4 pins the knight, so the repertoire often meets it with Ne2 and a3, untangling and keeping e4 alive.",
     "blk_Bd6": "When Black offers a trade with ...Bd6, White keeps the tension or develops naturally with e3 and Nf3.",
@@ -833,6 +869,11 @@ THEME_HOOK: Dict[str, str] = {
     "a3": "a3 = no annoying ...Bb4 pin.",
     "Bd3": "Bd3 aims at h7 and backs up e4.",
     "e4": "e4 is the Jobava punch — the London that actually attacks.",
+    "Bxe5": "Take back on e5 with the bishop — the tactics already worked.",
+    "take_englund": "Englund? Take the pawn, keep the pawn.",
+    "exd6": "Grabbed a pawn? Keep it and just develop.",
+    "d5_push": "Meet ...c5 with d5: space now, plans later.",
+    "e5_push": "Kick the knight with e5 — space plus attack.",
 }
 
 THEME_DIFFICULTY: Dict[str, int] = {
@@ -857,6 +898,11 @@ THEME_DIFFICULTY: Dict[str, int] = {
     "a3": 2,
     "Bd3": 2,
     "e4": 3,
+    "Bxe5": 3,
+    "take_englund": 2,
+    "exd6": 2,
+    "d5_push": 2,
+    "e5_push": 2,
 }
 
 THEME_MISTAKE: Dict[str, str] = {
@@ -871,6 +917,10 @@ THEME_MISTAKE: Dict[str, str] = {
     "e4": "Don't rush e4 before you're developed; premature in the centre, it just opens lines for the opponent.",
     "blk_e5": "As White, meet ...e5 concretely (dxe5 and the c7/d5 tactics) — passive play hands Black free equality.",
     "f3": "Remember f3 slightly weakens the king's diagonal; only commit to it when you intend g4/e4, not as a default.",
+    "take_englund": "Against the Englund, don't get greedy or fancy — beware the ...Qb4+ trick if you defend e5 carelessly with Bf4 too early.",
+    "exd6": "Don't rush to protect the extra pawn with awkward moves — development first; the pawn often holds itself.",
+    "e5_push": "Only push e5 when it gains a tempo or space that matters — otherwise it can leave d5 and the light squares weak.",
+    "d5_push": "After d5, don't let the position drift — Black wants ...e6/...b5 breaks; keep developing actively.",
 }
 
 

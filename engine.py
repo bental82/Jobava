@@ -49,20 +49,21 @@ class EngineLine:
 def find_stockfish(explicit: Optional[str] = None) -> Optional[str]:
     """Best-effort discovery of a Stockfish binary.
 
-    Order: explicit path -> ``STOCKFISH_PATH`` env var -> ``stockfish`` on PATH.
-    Returns ``None`` if nothing usable is found.
+    Order: explicit path -> ``STOCKFISH_PATH`` env var -> ``stockfish`` on PATH
+    -> common install locations (apt, Homebrew). Returns ``None`` if nothing
+    usable is found.
     """
     candidates = [
         explicit,
         os.environ.get("STOCKFISH_PATH"),
         shutil.which("stockfish"),
+        "/usr/games/stockfish",          # Debian/Ubuntu apt (also Streamlit Cloud)
+        "/usr/local/bin/stockfish",      # Homebrew (Intel mac) / manual install
+        "/opt/homebrew/bin/stockfish",   # Homebrew (Apple Silicon)
     ]
     for cand in candidates:
         if cand and os.path.isfile(cand) and os.access(cand, os.X_OK):
             return cand
-    # ``shutil.which`` already checks executability; accept it directly.
-    if candidates[2]:
-        return candidates[2]
     return None
 
 

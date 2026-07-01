@@ -1,0 +1,11 @@
+# Streamlit configuration for the Jobava London Rationale Explorer.
+
+[theme]
+base = "light"
+primaryColor = "#2b4a8b"
+backgroundColor = "#fdfcf8"
+secondaryBackgroundColor = "#eef2fa"
+textColor = "#1c1c1c"
+
+[browser]
+gatherUsageStats = false

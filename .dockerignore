@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.pyc
+.venv
+venv
+testenv
+*_study_guide.md
+*_study_guide.html
+.env

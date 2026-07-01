@@ -41,7 +41,13 @@ with any PGN repertoire.
 - **Optional AI explanations** via the Anthropic API (Claude) for richer,
   prose explanations. Disabled gracefully if no key is present.
 - **Board diagrams** (python-chess SVG) that update as you click through the
-  tree.
+  tree — with **arrows showing the next repertoire move(s)** (green = mainline,
+  amber = other branches).
+- **Fast navigation**: start/back/next buttons, a branch switcher for sibling
+  variations, a move search box, and jump-to-line.
+- **🎯 Train mode**: guess-the-move drilling. The app plays the opponent's
+  repertoire replies at random and asks for *your* move, with score, streak,
+  hints and instant "why" feedback — spaced-repetition style studying.
 - **Study-guide export** to **Markdown** and **HTML** (with board diagrams and
   FENs).
 
@@ -82,11 +88,15 @@ streamlit run app.py
 
 Your browser opens the app. Then:
 
-1. **Load a PGN** from the sidebar — upload a file, pick a bundled sample, or
-   load from a path on disk.
-2. **Click any move** in the repertoire tree on the left.
-3. Read the **Rationale** tab on the right; check **Engine** / **PGN context**
-   as needed; build a study guide from the **Export** tab.
+1. **Load a PGN** — use the quick-start buttons on the welcome screen, or the
+   sidebar (upload a file, pick a bundled sample, or load from a path on disk).
+2. **Explore**: click any move in the repertoire tree on the left (or use
+   ⏮/◀/▶ navigation and the search box). Read the **Rationale** tab on the
+   right; check **Engine** / **PGN context** as needed; build a study guide
+   from the **Export** tab.
+3. **Train**: switch to **🎯 Train** at the top and drill the repertoire
+   guess-the-move style. Opponent replies are randomised from the repertoire,
+   so every run covers different lines.
 
 ## Provide the PGN file
 
@@ -140,16 +150,54 @@ to the heuristic explanations.
 
 ---
 
+## Deploy it (optional)
+
+The app is a normal Streamlit app, so any host that runs a persistent Python
+process works.
+
+### Streamlit Community Cloud (free, easiest)
+
+1. Go to <https://share.streamlit.io> and sign in with GitHub.
+2. *Create app* → repo `bental82/Jobava`, branch **`production`**, main file
+   **`app.py`** → Deploy.
+3. The included `packages.txt` installs **Stockfish** automatically (the app
+   auto-detects it at `/usr/games/stockfish`).
+4. For AI explanations: app *Settings → Secrets* → add
+   `ANTHROPIC_API_KEY = "sk-ant-..."`.
+
+### Docker (Render, Railway, Fly.io, Cloud Run, your own box)
+
+```bash
+docker build -t jobava-explorer .
+docker run -p 8501:8501 -e ANTHROPIC_API_KEY=sk-ant-... jobava-explorer
+```
+
+The image bundles Stockfish and respects the host's `$PORT`, so it deploys
+unmodified to the usual container platforms.
+
+### A note on Vercel
+
+Vercel hosts static sites and short-lived serverless functions; it cannot run a
+persistent WebSocket server like Streamlit, so this app will always show
+*"No Production Deployment"* there. Use Streamlit Community Cloud or a container
+host instead.
+
+---
+
 ## Project structure
 
 ```
 .
-├── app.py            # Streamlit UI (tree, board, tabs)
-├── pgn_parser.py     # PGN -> repertoire tree (variations, comments, NAGs, FEN dedup)
-├── engine.py         # optional Stockfish wrapper (safe when missing)
-├── explainer.py      # heuristic + optional LLM rationale cards
-├── export.py         # Markdown / HTML study-guide export
+├── app.py             # Streamlit UI (Explore + Train modes, tree, board, tabs)
+├── pgn_parser.py      # PGN -> repertoire tree (variations, comments, NAGs, FEN dedup)
+├── engine.py          # optional Stockfish wrapper (safe when missing)
+├── explainer.py       # heuristic + optional LLM rationale cards
+├── export.py          # Markdown / HTML study-guide export
 ├── requirements.txt
+├── packages.txt       # apt deps for Streamlit Community Cloud (Stockfish)
+├── Dockerfile         # container image (bundles Stockfish)
+├── .streamlit/
+│   └── config.toml    # theme
 ├── README.md
 └── sample_data/
     ├── jobava_sample.pgn                 # tiny test PGN
@@ -165,6 +213,8 @@ to the heuristic explanations.
   more than the centipawns.
 - Export a Markdown/HTML guide once you've explored, and review it away from the
   board.
+- Once the ideas feel familiar, drill them in **🎯 Train** mode — a few random
+  lines a day beats one long session. Use the hint before revealing!
 
 ## Troubleshooting
 
