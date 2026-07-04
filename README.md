@@ -1,4 +1,4 @@
-# ♘ Jobava London — Opening Rationale Explorer
+# ♘ Opening Rationale Explorer — Jobava London & Scotch
 
 A small, local study tool that turns a **PGN repertoire** into an interactive
 *opening rationale explorer*. For every move in your repertoire it shows a
@@ -13,8 +13,14 @@ when you're learning an opening:
 6. What should you remember as a club-level player?
 7. What are the common alternatives, and why are they less relevant here?
 
-It is built around the **Jobava London System** (1.d4 + Nc3 + Bf4) but works
-with any PGN repertoire.
+It ships with **two complete White repertoires** — the **Jobava London**
+(1.d4 + Nc3 + Bf4) and a **Scotch-centred 1.e4 repertoire** (Scotch Game with
+the Qxd4 centralisation lines, 2.c3 Alapin vs the Sicilian, Advance Caro-Kann,
+Exchange French, the critical 3.Nxe5 Petroff with the Qe2 tricks, Stafford
+Gambit antidote, and refutations of the early gambits) — and works with any
+PGN repertoire. The explainer **auto-detects the opening family** from the
+loaded PGN (1.d4 → Jobava book, 1.e4 → Scotch book, anything else → a neutral
+principles book) and adapts every rationale card to it.
 
 > The explanations are written for a **beginner-to-intermediate** player who
 > wants practical understanding — plans, threats, piece activity, pawn breaks,
@@ -29,12 +35,13 @@ with any PGN repertoire.
   *repertoire tree*. Positions are deduplicated by **FEN**, so transpositions
   are recognised.
 - **Explains every position** with a rationale card containing: position
-  summary · why this move · Jobava London logic · what it prevents · candidate
-  alternatives · tactical checks · plans after the move · a memory hook · a
-  difficulty rating (1–5) · a common-mistake warning.
+  summary · why this move · opening logic (Jobava- or Scotch-aware) · what it
+  prevents · candidate alternatives · tactical checks · plans after the move ·
+  a memory hook · a difficulty rating (1–5) · a common-mistake warning.
 - **Heuristic explanations work offline** with no API key and no engine. They
   combine concrete board analysis (material, loose pieces, checks, pins, forks,
-  threats) with a built-in Jobava-London knowledge base.
+  threats) with built-in, opening-aware knowledge bases (Jobava London and
+  Scotch/1.e4), selected automatically per PGN.
 - **Optional Stockfish support**: evaluation before/after the move, the top 3
   engine candidates, and whether your repertoire move is among them — used as
   *supporting evidence only*, never as a replacement for the human explanation.
@@ -107,6 +114,8 @@ Three ways, all in the sidebar under *“1 · Load a PGN”*:
   - `jobava_sample.pgn` — a tiny example for testing (has a comment, a NAG and
     variations).
   - `jobava_london_repertoire.pgn` — a full Jobava London white repertoire.
+  - `scotch_repertoire.pgn` — a complete 1.e4 white repertoire built around
+    the Scotch Game (317 moves, 67 lines, answers to all main defences).
 - **Load from a path** on disk.
 
 Multiple games in one PGN are merged into a single repertoire tree, and
@@ -192,6 +201,7 @@ host instead.
 ├── pgn_parser.py      # PGN -> repertoire tree (variations, comments, NAGs, FEN dedup)
 ├── engine.py          # optional Stockfish wrapper (safe when missing)
 ├── explainer.py       # heuristic + optional LLM rationale cards
+├── openings.py        # opening knowledge bases (Jobava London, Scotch/1.e4) + auto-detection
 ├── export.py          # Markdown / HTML study-guide export
 ├── requirements.txt
 ├── packages.txt       # apt deps for Streamlit Community Cloud (Stockfish)
@@ -201,7 +211,8 @@ host instead.
 ├── README.md
 └── sample_data/
     ├── jobava_sample.pgn                 # tiny test PGN
-    └── jobava_london_repertoire.pgn      # full repertoire
+    ├── jobava_london_repertoire.pgn      # full Jobava London repertoire
+    └── scotch_repertoire.pgn             # full Scotch-centred 1.e4 repertoire
 ```
 
 ## Tips for study

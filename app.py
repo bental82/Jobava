@@ -1,4 +1,4 @@
-"""Jobava London — Opening Rationale Explorer (Streamlit app).
+"""Opening Rationale Explorer (Streamlit app) — Jobava London, Scotch, any PGN.
 
 Run with:  streamlit run app.py
 
@@ -47,7 +47,7 @@ ARROW_MAIN = "#15781BB0"   # green — mainline continuation
 ARROW_ALT = "#E69F00A0"    # amber — other repertoire branches
 
 st.set_page_config(
-    page_title="Jobava London Rationale Explorer",
+    page_title="Opening Rationale Explorer",
     page_icon="♞",
     layout="wide",
 )
@@ -156,8 +156,8 @@ def engine_info_for(node) -> Optional[dict]:
 # --------------------------------------------------------------------------- #
 def render_sidebar() -> None:
     ss = st.session_state
-    st.sidebar.title("♞ Jobava London")
-    st.sidebar.caption("Opening Rationale Explorer")
+    st.sidebar.title("♞ Rationale Explorer")
+    st.sidebar.caption("Jobava London · Scotch · any White repertoire")
 
     with st.sidebar.expander("1 · Load a PGN", expanded=ss.tree is None):
         uploaded = st.file_uploader("Upload a PGN file", type=["pgn"])
@@ -514,7 +514,7 @@ def render_rationale_tab(tree: RepertoireTree, node, engine_info) -> None:
 
     st.markdown(f"**📋 Position summary**\n\n{card.position_summary}")
     st.markdown(f"**🎯 Why this move**\n\n{card.why_this_move}")
-    st.markdown(f"**♘ Jobava London logic**\n\n{card.jobava_logic}")
+    st.markdown(f"**♘ {card.logic_label}**\n\n{card.opening_logic}")
     st.markdown(f"**🛡️ What it prevents**\n\n{card.prevents}")
 
     if card.alternatives:
@@ -908,7 +908,7 @@ def render_train(tree: RepertoireTree) -> None:
                 st.markdown(f"> 🧠 {card.memory_hook}")
                 with st.expander("Why this move?"):
                     st.markdown(card.why_this_move)
-                    st.markdown(f"_{card.jobava_logic}_")
+                    st.markdown(f"_{card.opening_logic}_")
             except Exception:
                 pass
 
@@ -936,14 +936,18 @@ def render_train(tree: RepertoireTree) -> None:
 # Main
 # --------------------------------------------------------------------------- #
 def render_welcome() -> None:
-    st.title("♞ Jobava London — Opening Rationale Explorer")
+    st.title("♞ Opening Rationale Explorer")
     st.markdown(
         """
 Turn a PGN repertoire into an interactive study tool. For every move you'll get
 a structured **rationale card**: what's happening, *why* the move is played, the
-Jobava London idea behind it, what it prevents, alternatives, tactics, plans, a
+opening idea behind it, what it prevents, alternatives, tactics, plans, a
 memory hook, a difficulty rating and a common-mistake warning. When you know the
 lines, switch to **🎯 Train** and drill them guess-the-move style.
+
+Two complete White repertoires ship in the box — the **Jobava London** (1.d4)
+and a **Scotch-centred 1.e4** repertoire — and the explanations automatically
+adapt to whichever opening family you load.
 
 This tool works fully offline. Stockfish and an Anthropic API key are optional
 extras — without them you still get the parsed tree, PGN comments, board
@@ -956,6 +960,7 @@ diagrams and the built-in heuristic explanations.
         cols = st.columns(min(3, len(samples)))
         descriptions = {
             "jobava_london_repertoire.pgn": "Full Jobava London white repertoire (260 moves, 70 lines).",
+            "scotch_repertoire.pgn": "Complete 1.e4 repertoire around the Scotch (317 moves, 67 lines): Qxd4 lines, 2.c3 vs the Sicilian, Petroff & Stafford antidotes, Caro/French answers.",
             "jobava_sample.pgn": "Tiny annotated sample — good for a first look.",
         }
         for col, sample in zip(cols, samples):
