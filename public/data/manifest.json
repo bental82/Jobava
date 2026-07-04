@@ -1,0 +1,20 @@
+[
+  {
+    "name": "jobava",
+    "title": "Jobava London (1.d4)",
+    "stats": {
+      "moves": 260,
+      "unique": 130,
+      "lines": 70
+    }
+  },
+  {
+    "name": "scotch",
+    "title": "Scotch Game (1.e4)",
+    "stats": {
+      "moves": 317,
+      "unique": 194,
+      "lines": 67
+    }
+  }
+]

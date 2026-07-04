@@ -20,9 +20,11 @@ testenv/
 .idea/
 .DS_Store
 
-# Generated study guides
+# Generated study guides (except the committed static-site copies)
 *_study_guide.md
 *_study_guide.html
+!public/guides/*_study_guide.md
+!public/guides/*_study_guide.html
 
 # Secrets
 .env

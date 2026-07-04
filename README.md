@@ -161,10 +161,32 @@ to the heuristic explanations.
 
 ## Deploy it (optional)
 
-The app is a normal Streamlit app, so any host that runs a persistent Python
-process works.
+### Vercel — static build (recommended)
 
-### Streamlit Community Cloud (free, easiest)
+The repository contains a **pre-built static version** of the explorer in
+`public/` (board, repertoire tree, all rationale cards, and a multiple-choice
+Train mode — everything except live Stockfish/AI, which need a server).
+`vercel.json` is already configured to serve it with **no build step**:
+
+1. In Vercel: *Add New → Project* → import `bental82/Jobava`,
+   branch `main` (or `production`).
+2. Leave every setting on default (`vercel.json` pins install/build to no-op
+   and the output directory to `public/`) → **Deploy**. Done.
+
+To regenerate the static site after changing a PGN or the explainer:
+
+```bash
+python build_static.py     # rewrites public/data/ and public/guides/
+```
+
+Local preview: `python -m http.server -d public` → <http://localhost:8000>.
+
+### Streamlit app — server hosts (full features: Stockfish + AI)
+
+The interactive Streamlit app needs a persistent Python process, so it does
+**not** run on Vercel — use one of these instead.
+
+#### Streamlit Community Cloud (free)
 
 1. Go to <https://share.streamlit.io> and sign in with GitHub.
 2. *Create app* → repo `bental82/Jobava`, branch **`production`**, main file
@@ -174,7 +196,7 @@ process works.
 4. For AI explanations: app *Settings → Secrets* → add
    `ANTHROPIC_API_KEY = "sk-ant-..."`.
 
-### Docker (Render, Railway, Fly.io, Cloud Run, your own box)
+#### Docker (Render, Railway, Fly.io, Cloud Run, your own box)
 
 ```bash
 docker build -t jobava-explorer .
@@ -183,13 +205,6 @@ docker run -p 8501:8501 -e ANTHROPIC_API_KEY=sk-ant-... jobava-explorer
 
 The image bundles Stockfish and respects the host's `$PORT`, so it deploys
 unmodified to the usual container platforms.
-
-### A note on Vercel
-
-Vercel hosts static sites and short-lived serverless functions; it cannot run a
-persistent WebSocket server like Streamlit, so this app will always show
-*"No Production Deployment"* there. Use Streamlit Community Cloud or a container
-host instead.
 
 ---
 
@@ -203,6 +218,10 @@ host instead.
 ├── explainer.py       # heuristic + optional LLM rationale cards
 ├── openings.py        # opening knowledge bases (Jobava London, Scotch/1.e4) + auto-detection
 ├── export.py          # Markdown / HTML study-guide export
+├── build_static.py    # generates the static site data (public/)
+├── public/            # static, Vercel-deployable build (index.html + data + guides)
+├── vercel.json        # serves public/ on Vercel with no build step
+├── Procfile           # start command for Heroku-style hosts
 ├── requirements.txt
 ├── packages.txt       # apt deps for Streamlit Community Cloud (Stockfish)
 ├── Dockerfile         # container image (bundles Stockfish)
